@@ -1,3 +1,12 @@
+ //Name: Cody Karigaca
+ //Title: Rocket Patrol- The Final Rocket
+ //Time: 5 hours 
+ //Mods: Mouse controls (5, have to hold right click to move),Allow the player to control the Rocket after it's fired (1),
+ //Display the time remaining (in seconds) on the screen (3), Implement the speed increase that happens after 30 seconds in the original game (1)
+ //Implement a new timing/scoring mechanism that adds time to the clock for successful hits and subtracts time for misses (5)
+//Create a new enemy Spaceship type (w/ new artwork) that's smaller, moves faster, and is worth more points (5)
+//3 5 pointers 2 1 pointers 1 3 pointer
+ //Citaions: just the phaser documentation   
     console.log("i hate broke people");
 
 let config={
@@ -6,7 +15,8 @@ let config={
     height: 480,
     scene: [Menu, Play],
     input: {
-        keyboard: true
+        keyboard: true,
+        pointer: true
     }
 }
 

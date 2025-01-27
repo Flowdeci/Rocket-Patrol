@@ -12,6 +12,7 @@ class Menu extends Phaser.Scene {
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png')
         this.load.image('starfield', './assets/starfield.png')
+        this.load.image('ufo', './assets/ufo.png')
 
         //load explositon spritesheet
         this.load.spritesheet('explosion', './assets/explosion.png', {
@@ -25,6 +26,11 @@ class Menu extends Phaser.Scene {
         this.load.audio('sfx_select', './assets/sfx-select.wav')
         this.load.audio('sfx_explosion', './assets/sfx-explosion.wav')
         this.load.audio('sfx_shot','./assets/sfx-shot.wav')
+        this.load.audio('sfx_explosion-2','./assets/explosion-2.mp3')
+        this.load.audio('sfx_explosion-3','./assets/explosion-3.mp3')
+        this.load.audio('sfx_explosion-4','./assets/explosion-4.mp3')
+        this.load.audio('sfx_explosion-5','./assets/explosion-5.mp3')
+
     }
 
     //adds objects to the scene
@@ -54,15 +60,16 @@ class Menu extends Phaser.Scene {
             fixedWidth: 0
         }
 
-        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'ROCKET PATROL', menuConfig).setOrigin(0.5);
-        this.add.text(game.config.width/2,game.config.height/2, 'Use <- -> arrows to move & (F) to fire', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'Rocket Patrol-The Final Rocket', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2,game.config.height/2, 'Use arros and F or mouse to play', menuConfig).setOrigin(0.5);
         menuConfig.backgroundColor='#00FF00';
         menuConfig.color='#000';
         this.add.text(game.config.width/2,game.config.height/2+borderUISize+borderPadding, 'Press <- for Novice or -> for Expert', menuConfig).setOrigin(0.5);
-        //this.scene.start("playScene");
+        
 
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+       
     }
 
     update() {

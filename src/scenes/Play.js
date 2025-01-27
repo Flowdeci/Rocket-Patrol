@@ -1,6 +1,7 @@
 class Play extends Phaser.Scene {
     constructor() {
         super("playScene")
+        
     }
 
     //adds objects to the scene
@@ -30,10 +31,11 @@ class Play extends Phaser.Scene {
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
         //add spaceships (x3)
-        this.ship01 = new Spaceship(this, game.config.width + borderUISize * 6, borderUISize * 4, 'spaceship', 0, 30).setOrigin(0, 0);
-        this.ship02 = new Spaceship(this, game.config.width + borderUISize * 3, borderUISize * 5 + borderPadding * 2, 'spaceship', 0, 20).setOrigin(0, 0);
-        this.ship03 = new Spaceship(this, game.config.width, borderUISize * 6 + borderPadding * 4, 'spaceship', 0, 10).setOrigin(0, 0);
-
+        this.ufo=new Spaceship(this,game.config.width + borderUISize * 6, borderUISize * 4, 'ufo', 0, 50).setOrigin(0, 0);
+        this.ship01 = new Spaceship(this, game.config.width + borderUISize * 6, borderUISize * 5, 'spaceship', 0, 30).setOrigin(0, 0);
+        this.ship02 = new Spaceship(this, game.config.width + borderUISize * 3, borderUISize * 6 + borderPadding * 2, 'spaceship', 0, 20).setOrigin(0, 0);
+        this.ship03 = new Spaceship(this, game.config.width, borderUISize * 6 + borderPadding * 5, 'spaceship', 0, 10).setOrigin(0, 0);
+        this.ufo.moveSpeed+=2;
         //initialize score
         this.p1Score = 0;
         //display score
@@ -49,8 +51,22 @@ class Play extends Phaser.Scene {
             },
             fixedWidth: 100
         }
+        let timeConfig = {
+            fontFamily: 'Courier',
+            fontSize: '28px',
+            backgroundColor: '#FF00FF',
+            color: '#843605',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5
+            },
+            fixedWidth: 100
+        }
 
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding * 2, this.p1Score, scoreConfig);
+
+        this.timeLeft = this.add.text(borderUISize + borderPadding+150, borderUISize + borderPadding * 2, this.gameTimer, timeConfig);
 
         this.gameOver = false;
 
@@ -62,16 +78,34 @@ class Play extends Phaser.Scene {
             this.gameOver = true;
         }, null, this)
 
+        this.timer_speed = this.time.addEvent({
+            delay: 30000, // 30 seconds in milliseconds
+            callback: this.increaseSpeed,
+            callbackScope: this, // Set the scope to the current scene
+            loop: true // Set to true to make it repeat every 30 seconds
+        });
+
+        this.explosionsArray = [
+            this.sound.add('sfx_explosion'),
+            this.sound.add('sfx_explosion-2'),
+            this.sound.add('sfx_explosion-3'),
+            this.sound.add('sfx_explosion-4'),
+            this.sound.add('sfx_explosion-5')
+        ];
     }
 
     update() {
         this.starfield.tilePositionX += 4;
+        if(this.p1Rocket.y <= borderUISize * 3 + borderPadding+1){
+            this.adjustTime(-5);
+        }
         if (!this.gameOver) {
             this.p1Rocket.update()
 
             this.ship01.update();
             this.ship02.update();
             this.ship03.update();
+            this.ufo.update();
         } else if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
             this.scene.restart()
         }else if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)){
@@ -91,6 +125,14 @@ class Play extends Phaser.Scene {
             this.p1Rocket.reset();
             this.shipExplode(this.ship01);
         }
+        if (this.checkCollision(this.p1Rocket, this.ufo)) {
+            this.ufo.reset();
+            this.shipExplode(this.ufo);
+        }
+
+        this.timeLeft.text = this.clock.getRemainingSeconds().toFixed(0);
+
+
     }
 
     checkCollision(rocket, ship) {
@@ -120,8 +162,36 @@ class Play extends Phaser.Scene {
         //score and text update
         this.p1Score += ship.points;
         this.scoreLeft.text = this.p1Score;
+        this.adjustTime(5);
 
-        this.sound.play('sfx_explosion');
+        this.explosionsArray[Phaser.Math.Between(0, this.explosionsArray.length - 1)].play();
+    }
+
+    adjustTime(seconds) {
+        // get orignal time and find the new time
+        let remainingTime = this.clock.getRemaining();
+        let newTime = remainingTime + seconds * 1000; // Convert seconds to milliseconds
+    
+        // clamp time
+        newTime = Math.max(0, newTime);
+    
+        // Reset the timer with the new time
+        this.clock.reset({
+            delay: newTime,
+            callback: this.clock.callback,
+            callbackScope: this.clock.callbackScope,
+            loop: this.clock.loop
+        });
+    
+        console.log(`Time adjusted. New remaining time: ${newTime / 1000} seconds`);
+    }
+
+    increaseSpeed(){
+        this.ship01.moveSpeed += 1;
+        this.ship02.moveSpeed += 1;
+        this.ship03.moveSpeed += 1;
+        this.ufo.moveSpeed += 2;
+        console.log("speed increase");
     }
 }
 
